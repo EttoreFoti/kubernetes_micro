@@ -1,0 +1,80 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jenkins-configuration-as-code
+data:
+  configuration-as-code.yaml: |
+    jenkins:
+      systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
+      numExecutors: 5
+      scmCheckoutRetryCount: 2
+      mode: NORMAL
+
+      globalNodeProperties:
+        - envVars:
+            env:
+              - key: FOO
+                value: BAR
+
+      authorizationStrategy:
+        loggedInUsersCanDoAnything:
+          allowAnonymousRead: false
+
+      clouds:
+        - docker:
+            name: "docker"
+            dockerApi:
+              dockerHost:
+                uri: "unix:///var/run/docker.sock"
+            templates:
+              - labelString: "docker-agent"
+                dockerTemplateBase:
+                  image: "jenkins/slave"
+                  volumes:
+                    - hello:/hello
+                    - world:/world
+                  environmentsString: |
+                    hello=world
+                    foo=bar
+                remoteFs: "/home/jenkins/agent"
+                connector:
+                  attach:
+                    user: "jenkins"
+                instanceCapStr: "10"
+
+    tool:
+      git:
+        installations:
+          - name: git
+            home: /usr/local/bin/git
+
+    unclassified:
+      artifactorybuilder:
+        useCredentialsPlugin: true
+        jfrogInstances:
+          - instanceId: artifactory
+            platformUrl: http://acme.com/artifactory
+            artifactoryUrl: http://acme.com/artifactory
+            distributionUrl: http://acme.com/distribution
+            resolverCredentialsConfig:
+              username: artifactory_user
+              password: "${ARTIFACTORY_PASSWORD}"
+
+      globalLibraries:
+        libraries:
+          - name: "awesome-lib"
+            retriever:
+              modernSCM:
+                scm:
+                  git:
+                    remote: "https://github.com/jenkins-infra/pipeline-library.git"
+
+      location:
+        adminAddress: you@example.com
+        url: https://ci.example.com/
+
+      mailer:
+        replyToAddress: do-not-reply@acme.org
+        smtpHost: smtp.acme.org
+        smtpPort: 4441

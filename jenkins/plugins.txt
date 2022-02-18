@@ -1,0 +1,7 @@
+kubernetes:1.31.3
+configuration-as-code:1346.ve8cfa_3473c94
+docker-plugin:1.2.6
+
+
+####
+- This is the plugin install script: https://github.com/jenkinsci/docker/blob/master/install-plugins.sh < plugins.txt
