@@ -1,0 +1,11 @@
+---
+# defaults file for initial_VMs_setup
+docker:
+  config_path: '/etc/docker'
+  repo_url: 'deb https://download.docker.com/linux/ubuntu xenial stable'
+
+gpg_keys:
+  google: 'https://packages.cloud.google.com/apt/doc/apt-key.gpg'
+  docker: 'https://download.docker.com/linux/ubuntu/gpg'
+
+kubernetes_repo_url: 'deb https://apt.kubernetes.io/ kubernetes-xenial main'

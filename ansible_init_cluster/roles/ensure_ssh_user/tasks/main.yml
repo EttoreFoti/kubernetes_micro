@@ -1,0 +1,28 @@
+---
+- name: "Ensure SSH User | Get existing users (idempotency)"
+  getent:
+    database: passwd
+
+- name: "Ensure SSH User | Create {{ default_ssh_user | default('testuser') }} User"
+  user:
+    name: "{{ default_ssh_user | default('testuser') }}"
+    append: yes
+    state: present
+    createhome: yes
+    shell: /bin/bash
+  when: "'{{ ssh_user_username | default('testuser') }}' not in ansible_facts.getent_passwd"
+
+- name: "Ensure SSH User | allow {{ default_ssh_user | default('testuser') }} to have passwordless sudo"
+  lineinfile:
+    dest: /etc/sudoers
+    line: "{{ default_ssh_user | default('testuser') }} ALL=(ALL) NOPASSWD: ALL"
+    validate: "visudo -cf %s"
+
+- name: "Ensure SSH User | Set Up Authorized Keys for {{ default_ssh_user | default('testuser') }}"
+  authorized_key:
+    user: '{{ default_ssh_user | default("testuser") }}'
+    key: '{{item}}'
+    state: present
+  with_file:
+    - "{{ default_ssh_user_keypath | default('~/.ssh/id_rsa_test.pub') }}"
+    #TODO Modify and put test pub

@@ -1,0 +1,19 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint: |
+  set -e ansible-lint
+platforms:
+  - name: Ubuntu-2004-LTS
+    image: geerlingguy/docker-ubuntu2004-ansible:latest #image built for complete testing of real testings
+    command: ""
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro #needed to use systemd
+    privileged: true #it is needed for systemd, it should be done only with trusted software
+    pre_build_image: true
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

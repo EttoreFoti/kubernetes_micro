@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include initial_VMs_setup"
+      include_role:
+        name: "initial_VMs_setup"

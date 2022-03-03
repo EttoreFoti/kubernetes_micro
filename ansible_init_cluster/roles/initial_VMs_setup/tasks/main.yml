@@ -1,0 +1,5 @@
+---
+- name: 'Initial VMs Setup | Install Required GPG Keys'
+  import_tasks: installKeysAndRepositories.yml
+- name: 'Initial VMs Setup | Enable Swap and Kernel Modules + Install Required Packages'
+  import_tasks: enableSwapAndModules.yml

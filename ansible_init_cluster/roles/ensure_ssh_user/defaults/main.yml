@@ -1,0 +1,4 @@
+---
+# defaults file for ensure_ssh_user
+default_ssh_user: ettorefoti
+default_ssh_user_keypath: ~/.ssh/id_rsa.pub

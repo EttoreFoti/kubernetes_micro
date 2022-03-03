@@ -1,0 +1,37 @@
+---
+# This is the playbook to run Ansible tests on Ensure SSH User role.
+- name: Ensure SSH User Verifier
+  hosts: all
+  gather_facts: true
+  tasks:
+  - include_vars: "../../defaults/installKeysAndRepositories.yml"
+  - name: "Ensure SSH User Verifier | Get existing users (for idempotency)"
+    getent:
+      database: passwd
+  - name: debug
+    debug:
+      msg: '{{ ansible_facts.getent_passwd }} {{ default_ssh_user }}'
+  - name: 'Ensure SSH User Verifier | Check user: "{{ default_ssh_user | default(testuser) }}" existence'
+    assert:
+      that: '"{{ default_ssh_user | default(testuser) }}" in {{ ansible_facts.getent_passwd }}'
+  - name: 'Ensure SSH User Verifier | Allow {{ default_ssh_user | default("testuser") }} to have passwordless sudo'
+    lineinfile:
+      dest: /etc/sudoers
+      line: "{{ default_ssh_user | default('testuser') }} ALL=(ALL) NOPASSWD: ALL"
+      validate: "visudo -cf %s"
+    check_mode: true
+    register: user_sudo_presence
+  - name: 'Ensure SSH User Verifier | Assert that created user is sudo'
+    assert:
+      that: not user_sudo_presence.changed
+  - name: "set up authorized keys for the {{ default_ssh_user | default('testuser') }} user"
+    authorized_key:
+      user: '{{ default_ssh_user | default("testuser") }}'
+      key: '{{item}}'
+      state: present
+    with_file:
+      - "{{ default_ssh_user_keypath | default('~/.ssh/id_rsa_test.pub') }}"
+    register: key_presence
+  - name: 'Ensure SSH User Verifier | Assert that user ssh key was exchanged correctly'
+    assert:
+      that: not key_presence.changed
