@@ -1,4 +1,11 @@
 ---
+- name: 'Initial VMs Setup | Install Initial Required Packages'
+  apt:
+    name: '{{ item }}'
+    state: present
+    update_cache: true
+  with_items: '{{ required_packages }}'
+
 - name: 'Initial VMs Setup | Create Docker config directory'
   file:
     path: '{{ docker.config_path | default("/etc/docker")}}'
@@ -6,7 +13,7 @@
 
 - name: 'Initial VMs Setup | Changing Docker to systemd driver'
   copy:
-    dest: "/etc/docker/daemon.json"
+    dest: '{{ docker.config_path | default("/etc/docker")}}/daemon.json'
     content: |
       {
       "exec-opts": ["native.cgroupdriver=systemd"]
@@ -19,39 +26,37 @@
     state: present
   with_items: '{{ gpg_keys }}'
 
-- name: 'Initial VMs Setup | Add APT Repository for Stable Version'
+- name: 'Initial VMs Setup | Add APT Repository for Docker Stable Version'
   become: true
   apt_repository:
     repo: '{{ docker.repo_url }}'
     state: present
 
-- name: "Initial VMs Setup | Add Kubernetes Repository"
+- name: 'Initial VMs Setup | Add Kubernetes Repository'
   become: true
   apt_repository:
-    repo: '{{ kubernetes_repo_url }}'
+    repo: '{{ kubernetes.repo_url }}'
     state: present
     filename: kubernetes.list
 
-  - name: "Initial VMs Setup | Install All Required Packages"
-    with_items:
-      - ca-certificates
-      - apt-transport-https
-      - curl
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
-      - kubeadm
-      - kubectl
-      - kubelet
-    apt:
-      name: "{{ item }}"
-      state: present
-      update_cache: yes
+- name: 'Initial VMs Setup | Install Docker Required Packages'
+  apt:
+    name: '{{ item }}'
+    state: present
+    update_cache: true
+  with_items: '{{ docker.required_packages }}'
 
-  - name: "Initial VMs Setup | APT Mark Hold Kubernetes Packages"
-    become: yes
-    with_items:
-      - kubeadm
-      - kubelet
-      - kubectl
-    command: "apt-mark hold {{ item }}"
+- name: 'Initial VMs Setup | Install Kubernetes Required Packages'
+  apt:
+    name: '{{ item }}'
+    state: present
+    update_cache: true
+  with_items: '{{ kubernetes.required_packages }}'
+
+- name: 'Initial VMs Setup | APT Mark Hold Kubernetes Packages'
+  become: true
+  with_items:
+    - kubeadm
+    - kubelet
+    - kubectl
+  command: "apt-mark hold {{ item }}"

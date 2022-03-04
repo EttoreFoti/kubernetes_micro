@@ -3,9 +3,25 @@
 docker:
   config_path: '/etc/docker'
   repo_url: 'deb https://download.docker.com/linux/ubuntu xenial stable'
+  required_packages:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
 
 gpg_keys:
-  google: 'https://packages.cloud.google.com/apt/doc/apt-key.gpg'
-  docker: 'https://download.docker.com/linux/ubuntu/gpg'
+  - 'https://packages.cloud.google.com/apt/doc/apt-key.gpg' # Google/K8s
+  - 'https://download.docker.com/linux/ubuntu/gpg' # Docker
 
-kubernetes_repo_url: 'deb https://apt.kubernetes.io/ kubernetes-xenial main'
+kubernetes:
+  repo_url: 'deb https://apt.kubernetes.io/ kubernetes-xenial main'
+  required_packages:
+    - kubeadm
+    - kubectl
+    - kubelet
+
+required_packages:
+  - ca-certificates
+  - apt-transport-https
+  - curl
+  - wget
+  - gpg-agent

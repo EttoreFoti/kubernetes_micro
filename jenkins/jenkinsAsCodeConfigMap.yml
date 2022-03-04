@@ -7,21 +7,83 @@ data:
   configuration-as-code.yaml: |
     jenkins:
       systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
-      numExecutors: 5
+      numExecutors: 0
       scmCheckoutRetryCount: 2
       mode: NORMAL
-
-      globalNodeProperties:
-        - envVars:
-            env:
-              - key: FOO
-                value: BAR
 
       authorizationStrategy:
         loggedInUsersCanDoAnything:
           allowAnonymousRead: false
 
       clouds:
+        - kubernetes:
+            name: "Kubernetes-CloudBuilder"
+            serverUrl: "http://142.132.162.229:32000"
+            serverCertificate: "serverCertificate"
+            skipTlsVerify: true
+            credentialsId: "advanced-k8s-credentials"
+            namespace: "default"
+            jenkinsUrl: "http://jenkins/"
+            jenkinsTunnel: "jenkinsTunnel"
+            containerCapStr: 42
+            maxRequestsPerHostStr: 64
+            retentionTimeout: 5
+            connectTimeout: 10
+            readTimeout: 20
+
+            templates:
+              - name: "test"
+                serviceAccount: "serviceAccount"
+                instanceCap: 1234
+                idleMinutes: 0
+                label: "label"
+                volumes:
+                  - hostPathVolume:
+                      mountPath: "mountPath"
+                      hostPath: "hostPath"
+
+                containers:
+                  - name: "name"
+                    image: "image"
+                    privileged: true
+                    alwaysPullImage: true
+                    command: "command"
+                    args: "args"
+                    workingDir: "workingDir"
+                    ttyEnabled: true
+                    resourceRequestCpu: "resourceRequestCpu"
+                    resourceRequestMemory: "resourceRequestMemory"
+                    resourceLimitCpu: "resourceLimitCpu"
+                    resourceLimitMemory: "resourceLimitMemory"
+                imagePullSecrets:
+                  - name: "imagePullSecrets"
+
+                envVars:
+                  - envVar:
+                      key: "FOO"
+                      value: "BAR"
+
+              - name: "k8s-agent"
+                namespace: "default"
+                label: "linux-x86_64"
+                nodeUsageMode: EXCLUSIVE
+                containers:
+                  - name: "jnlp"
+                    image: "jenkins/inbound-agent:latest"
+                    alwaysPullImage: true
+                    workingDir: "/home/jenkins"
+                    ttyEnabled: true
+                    resourceRequestCpu: "500m"
+                    resourceLimitCpu: "1000m"
+                    resourceRequestMemory: "1Gi"
+                    resourceLimitMemory: "2Gi"
+                volumes:
+                  - emptyDirVolume:
+                      memory: false
+                      mountPath: "/tmp"
+                idleMinutes: "1"
+                activeDeadlineSeconds: "120"
+                slaveConnectTimeout: "1000"
         - docker:
             name: "docker"
             dockerApi:

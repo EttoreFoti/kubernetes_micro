@@ -5,6 +5,22 @@
   hosts: all
   gather_facts: false
   tasks:
-  - name: Example assertion
+  - import_vars: '../../defaults/main.yml'
+  - name: 'Initial VMs Setup Verifier | Check status of Docker config directory'
+    file:
+      path: '{{ docker.config_path | default("/etc/docker")}}'
+      state: directory
+    check_mode: true
+    register: docker_config_path_status
+  - name: 'Initial VMs Setup Verifier | Assert that docker.config_path has been correctly created'
     assert:
-      that: true
+      that: not docker_config_path_status.changed
+  - name: 'Initial VMs Setup Verifier | Check Docker driver'
+    lineinfile:
+      dest: '{{ docker.config_path | default("/etc/docker")}}/daemon.json'
+      line: '"exec-opts": ["native.cgroupdriver=systemd"]'
+    check_mode: true
+    register: docker_driver_status
+  - name: 'Initial VMs Setup Verifier | Assert that docker driver has been correctly changed to systemd'
+    assert:
+      that: not docker_driver_status.changed

@@ -16,7 +16,7 @@
 
 - name: 'Initial VMs Setup | Remove swapfile from /etc/fstab'
   mount:
-    name: "{{ item }}"
+    name: '{{ item }}'
     fstype: swap
     state: absent
   with_items:
@@ -39,4 +39,4 @@
     - "8080"
   community.general.ufw:
     rule: allow
-    port: "{{ item }}"
+    port: '{{ item }}'

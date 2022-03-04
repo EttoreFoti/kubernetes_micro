@@ -2,6 +2,7 @@ galaxy_info:
   author: Ettore Foti
   description: Jr. DevOps Engineer
   #company: your company (optional)
+  role_name: ensure
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value

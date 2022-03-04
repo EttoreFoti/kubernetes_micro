@@ -1,7 +1,8 @@
 ---
 - name: Converge
   hosts: all
+  gather_facts: true
   tasks:
-    - name: "Include initial_VMs_setup"
+    - name: 'Include initial_VMs_setup'
       include_role:
-        name: "initial_VMs_setup"
+        name: 'initial_VMs_setup'
