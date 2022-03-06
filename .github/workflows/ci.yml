@@ -20,8 +20,7 @@ jobs:
       - name: Install test dependencies.
         run: pip3 install ansible molecule docker molecule-docker yamllint ansible-lint flake8 molecule-vagrant
       - name: Run Molecule tests.
-        run: cd roles/initVMs && molecule test
+        run: cd ansible/roles/ensure_ssh_user && molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
-          MOLECULE_DISTRO: centos7
