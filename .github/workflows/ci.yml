@@ -31,13 +31,10 @@ jobs:
         run: pip3 install ansible molecule docker molecule-docker yamllint ansible-lint flake8 molecule-vagrant python-vagrant
       - name: Install vagrant parallels plugin
         run: vagrant plugin install vagrant-parallels
-      - name: Enable vagrant box caching
-        uses: actions/cache@v2
+      - name: Create test box
+        run: |
+          ./tools/create_testbox.sh
         if: ${{ ! matrix.skip_vagrant }}
-        with:
-          path: |
-            ~/.vagrant.d/boxes
-          key: ${{ runner.os }}-${{ hashFiles('tools/Vagrantfile') }}
       - name: Run Molecule tests.
         run: cd ansible_init_cluster/roles/ensure_ssh_user && molecule test && cd ../initial_VMs_setup && molecule test
         env:
