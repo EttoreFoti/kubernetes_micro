@@ -4,7 +4,7 @@ set -euxo pipefail
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Used to test that Vagrant is usable and also to pre-download the image
-# we will use during testing.
+# we will use during testing if it goes..
 cd $DIR
 
 vagrant box list |grep -qw testbox && exit 0
