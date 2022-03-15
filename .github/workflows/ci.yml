@@ -8,20 +8,48 @@ jobs:
   test:
     name: Molecule
     runs-on: macos-10.15
-    #strategy:
-      #matrix:
+    strategy:
+      matrix:
+        include:
+          - TESTBOX: generic/debian11
+            skip_vagrant: false
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v2
+      - name: Enable vagrant box caching
+        uses: actions/cache@v2
+        if: ${{ ! matrix.skip_vagrant }}
+        with:
+          path: |
+            ~/.vagrant.d/boxes
+          key: ${{ runner.os }}-${{ hashFiles('ansible_init_cluster/ci_tools/Vagrantfile') }}
       - name: Set up Python 3.
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
       - name: Install test dependencies.
         run: pip3 install ansible molecule docker molecule-docker yamllint ansible-lint flake8 molecule-vagrant python-vagrant
+      - name: Install vagrant parallels plugin
+        run: vagrant plugin install vagrant-parallels
+      - name: Enable vagrant box caching
+        uses: actions/cache@v2
+        if: ${{ ! matrix.skip_vagrant }}
+        with:
+          path: |
+            ~/.vagrant.d/boxes
+          key: ${{ runner.os }}-${{ hashFiles('tools/Vagrantfile') }}
       - name: Run Molecule tests.
         run: cd ansible_init_cluster/roles/ensure_ssh_user && molecule test && cd ../initial_VMs_setup && molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           TESTBOX: generic/ubuntu2004
+  check:
+    needs:
+      - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report success of the test matrix
+        run: >-
+          print("All's good")
+        shell: python
