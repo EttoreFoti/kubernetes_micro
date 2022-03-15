@@ -4,6 +4,7 @@
     database: passwd
 
 - name: "Ensure SSH User | Create {{ default_ssh_user | default('testuser') }} User"
+  become: true
   user:
     name: "{{ default_ssh_user | default('testuser') }}"
     append: yes
@@ -13,12 +14,14 @@
   when: "'{{ ssh_user_username | default('testuser') }}' not in ansible_facts.getent_passwd"
 
 - name: "Ensure SSH User | allow {{ default_ssh_user | default('testuser') }} to have passwordless sudo"
+  become: true
   lineinfile:
     dest: /etc/sudoers
     line: "{{ default_ssh_user | default('testuser') }} ALL=(ALL) NOPASSWD: ALL"
     validate: "visudo -cf %s"
 
 - name: "Ensure SSH User | Set Up Authorized Keys for {{ default_ssh_user | default('testuser') }}"
+  become: true
   authorized_key:
     user: '{{ default_ssh_user | default("testuser") }}'
     key: '{{item}}'

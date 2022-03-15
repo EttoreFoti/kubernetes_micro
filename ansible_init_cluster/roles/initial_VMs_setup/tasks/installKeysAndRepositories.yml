@@ -1,5 +1,6 @@
 ---
 - name: 'Initial VMs Setup | Install Initial Required Packages'
+  become: true
   apt:
     name: '{{ item }}'
     state: present
@@ -7,17 +8,21 @@
   with_items: '{{ required_packages }}'
 
 - name: 'Initial VMs Setup | Create Docker config directory'
+  become: true
   file:
-    path: '{{ docker.config_path | default("/etc/docker")}}'
+    path: '{{ docker.config_path | default("/etc/docker") }}'
     state: directory
+    mode: 0755
 
 - name: 'Initial VMs Setup | Changing Docker to systemd driver'
+  become: true
   copy:
-    dest: '{{ docker.config_path | default("/etc/docker")}}/daemon.json'
+    dest: '{{ docker.config_path | default("/etc/docker") }}/daemon.json'
     content: |
       {
       "exec-opts": ["native.cgroupdriver=systemd"]
       }
+    mode: 0755
 
 - name: 'Initial VMs Setup | Install Required GPG Keys for Docker'
   become: true
@@ -40,6 +45,7 @@
     filename: kubernetes.list
 
 - name: 'Initial VMs Setup | Install Docker Required Packages'
+  become: true
   apt:
     name: '{{ item }}'
     state: present
@@ -47,6 +53,7 @@
   with_items: '{{ docker.required_packages }}'
 
 - name: 'Initial VMs Setup | Install Kubernetes Required Packages'
+  become: true
   apt:
     name: '{{ item }}'
     state: present
@@ -60,3 +67,4 @@
     - kubelet
     - kubectl
   command: "apt-mark hold {{ item }}"
+  changed_when: false

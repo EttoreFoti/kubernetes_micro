@@ -5,8 +5,9 @@
   hosts: all
   gather_facts: false
   tasks:
-  - import_vars: '../../defaults/main.yml'
+  - include_vars: '../../defaults/main.yml'
   - name: 'Initial VMs Setup Verifier | Check status of Docker config directory'
+    become: true
     file:
       path: '{{ docker.config_path | default("/etc/docker")}}'
       state: directory
@@ -16,6 +17,7 @@
     assert:
       that: not docker_config_path_status.changed
   - name: 'Initial VMs Setup Verifier | Check Docker driver'
+    become: true
     lineinfile:
       dest: '{{ docker.config_path | default("/etc/docker")}}/daemon.json'
       line: '"exec-opts": ["native.cgroupdriver=systemd"]'

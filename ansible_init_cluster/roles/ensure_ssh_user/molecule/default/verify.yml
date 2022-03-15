@@ -4,7 +4,7 @@
   hosts: all
   gather_facts: true
   tasks:
-  - include_vars: "../../defaults/installKeysAndRepositories.yml"
+  - include_vars: "../../defaults/main.yml"
   - name: "Ensure SSH User Verifier | Get existing users (for idempotency)"
     getent:
       database: passwd
@@ -15,6 +15,7 @@
     assert:
       that: '"{{ default_ssh_user | default(testuser) }}" in {{ ansible_facts.getent_passwd }}'
   - name: 'Ensure SSH User Verifier | Allow {{ default_ssh_user | default("testuser") }} to have passwordless sudo'
+    become: true
     lineinfile:
       dest: /etc/sudoers
       line: "{{ default_ssh_user | default('testuser') }} ALL=(ALL) NOPASSWD: ALL"
@@ -25,6 +26,7 @@
     assert:
       that: not user_sudo_presence.changed
   - name: "set up authorized keys for the {{ default_ssh_user | default('testuser') }} user"
+    become: true
     authorized_key:
       user: '{{ default_ssh_user | default("testuser") }}'
       key: '{{item}}'
