@@ -33,7 +33,7 @@ jobs:
         run: vagrant plugin install vagrant-parallels
       - name: Create test box
         run: |
-          ./tools/create_testbox.sh
+          ./ansible_init_cluster/ci_tools/create_testbox.sh
         if: ${{ ! matrix.skip_vagrant }}
       - name: Run Molecule tests.
         run: cd ansible_init_cluster/roles/ensure_ssh_user && molecule test && cd ../initial_VMs_setup && molecule test
