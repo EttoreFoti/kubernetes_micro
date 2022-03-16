@@ -5,5 +5,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="docker_init_challenge" />
+    <orderEntry type="module" module-name="Ansible-K8s" />
   </component>
 </module>

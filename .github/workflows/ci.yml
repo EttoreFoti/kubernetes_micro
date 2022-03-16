@@ -1,4 +1,4 @@
-name: CI Testing initVMs role only
+name: CI Testing ensure_ssh_user and inital_VMs_setup roles only
 'on':
   pull_request:
   push:
@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - TESTBOX: generic/debian11
+          - TESTBOX: generic/ubuntu2004
             skip_vagrant: false
     steps:
       - name: Check out the codebase.
