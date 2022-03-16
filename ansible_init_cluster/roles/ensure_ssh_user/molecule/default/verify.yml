@@ -10,10 +10,10 @@
       database: passwd
   - name: debug
     debug:
-      msg: '{{ ansible_facts.getent_passwd }} {{ default_ssh_user | default(testuser) }}'
+      msg: '{{ ansible_facts.getent_passwd }} {{ default_ssh_user | default("testuser") }}'
   - name: 'Ensure SSH User Verifier | Check user: "{{ default_ssh_user | default(testuser) }}" existence'
     assert:
-      that: '"{{ default_ssh_user | default(testuser) }}" in {{ ansible_facts.getent_passwd }}'
+      that: '{{ default_ssh_user | default("testuser") }} in {{ ansible_facts.getent_passwd }}'
   - name: 'Ensure SSH User Verifier | Allow {{ default_ssh_user | default("testuser") }} to have passwordless sudo'
     become: true
     lineinfile:
