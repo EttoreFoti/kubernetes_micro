@@ -27,5 +27,5 @@
     key: '{{item}}'
     state: present
   with_file:
-    - "{{ default_ssh_user_keypath | default('~/.ssh/id_rsa_test.pub') }}"
+    - "{{ default_ssh_user_keypath | default('files/test_rsa.pub') }}"
     #TODO Modify and put test pub

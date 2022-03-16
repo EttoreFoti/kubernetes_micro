@@ -1,4 +1,7 @@
 ---
 # defaults file for ensure_ssh_user
-default_ssh_user: ettorefoti
-default_ssh_user_keypath: ~/.ssh/id_rsa.pub
+# Comment Variables before pushing for correct CI Molecule Test is needed
+#TODO FIX variables comments needs
+
+#default_ssh_user: ettorefoti
+#default_ssh_user_keypath: ~/.ssh/id_rsa.pub
