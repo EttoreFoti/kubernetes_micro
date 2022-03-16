@@ -13,7 +13,7 @@
       msg: '{{ ansible_facts.getent_passwd }} {{ default_ssh_user | default("testuser") }}'
   - name: 'Ensure SSH User Verifier | Check user: "{{ default_ssh_user | default(testuser) }}" existence'
     assert:
-      that: '{{ default_ssh_user | default("testuser") }} in {{ ansible_facts.getent_passwd }}'
+      that: '"{{ default_ssh_user | default("testuser") }}" in {{ ansible_facts.getent_passwd }}'
   - name: 'Ensure SSH User Verifier | Allow {{ default_ssh_user | default("testuser") }} to have passwordless sudo'
     become: true
     lineinfile:
@@ -32,7 +32,7 @@
       key: '{{item}}'
       state: present
     with_file:
-      - "{{ default_ssh_user_keypath | default('~files/test_rsa.pub') }}"
+      - "{{ default_ssh_user_keypath | default('files/test_rsa.pub') }}"
     register: key_presence
   - name: 'Ensure SSH User Verifier | Assert that user ssh key was exchanged correctly'
     assert:
