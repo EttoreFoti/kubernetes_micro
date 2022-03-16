@@ -32,7 +32,7 @@
       key: '{{item}}'
       state: present
     with_file:
-      - "{{ default_ssh_user_keypath | default('files/test_rsa.pub') }}"
+      - "{{ default_ssh_user_keypath | default('../../files/test_rsa.pub') }}"
     register: key_presence
   - name: 'Ensure SSH User Verifier | Assert that user ssh key was exchanged correctly'
     assert:
