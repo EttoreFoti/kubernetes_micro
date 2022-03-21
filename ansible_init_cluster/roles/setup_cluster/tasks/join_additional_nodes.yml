@@ -1,0 +1,70 @@
+---
+- name: debug
+  debug:
+    msg: "{{ hostvars['master1'].ansible_host }}"
+
+- name: Join Additional Nodes | Get Join Command
+  become: true
+  become_user: ettorefoti
+  shell: 'kubeadm token create --print-join-command' #just for knowledge, this is not correct, this should point to the LB address
+  register: join_command_raw
+  changed_when: false #TODO find if there is a better way to avoid it
+  when: '"master1" in inventory_hostname'
+
+- name: debug
+  debug:
+    msg: "{{ hostvars['master1'].join_command_raw.stdout_lines }}"
+
+#- name: Join Additional Nodes | Set Join Command ansible_fact
+#  set_fact:
+#    join_command: "{{ join_command_raw.stdout_lines[0] }}"
+#  when: '"master1" in inventory_hostname'
+
+- name: Ensure PKI Path exists on additional controlplanes
+  become: true
+  file:
+    path: /etc/kubernetes/pki/etcd
+    state: directory
+    mode: 0644
+    owner: ettorefoti
+  when: 'inventory_hostname in groups["hybrids"]' #TODO it should do additional masters
+
+- name: Test Synch
+  become: true
+  command: "rsync -avPh -e 'ssh -i /home/ettorefoti/.ssh/id_rsa -o StrictHostKeyChecking=no' /etc/kubernetes/pki/{{ item }} {{ hostvars[inventory_hostname].ansible_host }}:/etc/kubernetes/pki/{{ item }}"
+  delegate_to: master1
+  when: 'inventory_hostname in groups["hybrids"]'
+  with_items:
+    - ca.crt
+    - ca.key
+    - sa.key
+    - sa.pub
+    - front-proxy-ca.crt
+    - front-proxy-ca.key
+    - ca.key
+    - etcd/ca.crt
+    - etcd/ca.key
+
+- name: Join Additional Nodes | Make additional ControlPlanes join cluster
+  become: true
+  shell: "{{ hostvars['master1'].join_command_raw.stdout_lines[0] }} --control-plane >> node_joined.txt"
+  args:
+    chdir: $HOME
+    creates: node_joined.txt
+  when: 'inventory_hostname in groups["hybrids"]'
+
+- name: Join Additional Nodes | Make Workers join cluster
+  become: true
+  shell: "{{ hostvars['master1'].join_command_raw.stdout_lines[0] }} >> node_joined.txt"
+  args:
+    chdir: $HOME
+    creates: node_joined.txt
+  when: 'inventory_hostname in groups["workers"]'
+
+- name: Join Additional Nodes | Restart Kubelets
+  become: true
+  ansible.builtin.systemd:
+    state: restarted
+    daemon_reload: true
+    name: kubelet
+  when: 'inventory_hostname in groups["hybrids"]'

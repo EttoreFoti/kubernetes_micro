@@ -1,7 +1,15 @@
 ---
 - name: Converge
   hosts: all
+  gather_facts: true
   tasks:
+    - name: "Include ensure_ssh_user"
+      include_role:
+        name: "ensure_ssh_user"
+    - name: "Include initial_VMs_setup"
+      include_role:
+        name: "initial_VMs_setup"
     - name: "Include setup_cluster"
       include_role:
         name: "setup_cluster"
+

@@ -1,34 +1,36 @@
 ---
-- name: initialize the cluster
-  shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
+- name: Init K8s Cluster on Master1 | initialize the cluster
+  become: true
+  shell: 'kubeadm init --pod-network-cidr=10.244.0.0/16 --control-plane-endpoint {{ hostvars["master1"].ansible_host }}:6443 --upload-certs >> cluster_initialized.txt'
   args:
     chdir: $HOME
     creates: cluster_initialized.txt
 
-- name: create .kube directory
+- name: Init K8s Cluster on Master1 | create .kube directory
   become: true
   become_user: ettorefoti
   file:
     path: $HOME/.kube
     state: directory
-    mode: 0755
 
-- name: copy admin.conf to user's kube config
+- name: Init K8s Cluster on Master1 | copy admin.conf to user's kube config
+  become: true
   copy:
     src: /etc/kubernetes/admin.conf
     dest: /home/ettorefoti/.kube/config
     remote_src: true
     owner: ettorefoti
+    mode: 0664
 
-- name: install Pod network
-  become: yes
+- name: Init K8s Cluster on Master1 | install Pod network
+  become: true
   become_user: ettorefoti
-  shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml >> pod_network_setup.txt
+  shell: "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml >> pod_network_setup.txt"
   args:
     chdir: $HOME
     creates: pod_network_setup.txt
 
-- name: Restart kubelet
+- name: Init K8s Cluster on Master1 | Restart kubelet #TODO move to handler all istances
   become: true
   ansible.builtin.systemd:
     state: restarted

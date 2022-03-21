@@ -8,8 +8,30 @@
  lint: |
    set -e ansible-lint
  platforms:
-   - name: Ubuntu-2004-LTS
+   - name: master1
      box: ${TESTBOX:-jeffnoxon/ubuntu-20.04-arm64}
+     memory: 1800
+     groups:
+      - masters
+     interfaces:
+     - network_name: private_network
+       ip: 192.168.56.2
+   - name: worker1
+     box: ${TESTBOX:-jeffnoxon/ubuntu-20.04-arm64}
+     memory: 1800
+     groups:
+      - workers
+     interfaces:
+     - network_name: private_network
+       ip: 192.168.56.3
+   - name: hybrid1
+     box: ${TESTBOX:-jeffnoxon/ubuntu-20.04-arm64}
+     memory: 1800
+     groups:
+      - hybrids
+     interfaces:
+       - network_name: private_network
+         ip: 192.168.56.4
  provisioner:
    name: ansible
  verifier:
