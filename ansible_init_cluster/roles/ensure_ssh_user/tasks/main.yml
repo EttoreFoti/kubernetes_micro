@@ -3,6 +3,17 @@
   getent:
     database: passwd
 
+- name: "Ensure SSH User | Get existing groups (idempotency)"
+  getent:
+    database: group
+
+- name: "Ensure SSH User | Create SSH group"
+  become: true
+  group:
+    name: sshusers
+    state: present
+  when: '"sshusers" not in ansible_facts.getent_group'
+
 - name: "Ensure SSH User | Create {{ default_ssh_user | default('testuser') }} User"
   become: true
   user:
@@ -11,6 +22,8 @@
     state: present
     createhome: yes
     shell: /bin/bash
+    generate_ssh_key: true
+    group: sshusers
   when: "'{{ ssh_user_username | default('testuser') }}' not in ansible_facts.getent_passwd"
 
 - name: "Ensure SSH User | allow {{ default_ssh_user | default('testuser') }} to have passwordless sudo"
@@ -20,12 +33,47 @@
     line: "{{ default_ssh_user | default('testuser') }} ALL=(ALL) NOPASSWD: ALL"
     validate: "visudo -cf %s"
 
-- name: "Ensure SSH User | Set Up Authorized Keys for {{ default_ssh_user | default('testuser') }}"
+- name: "Ensure SSH User | Fetch generated key file"
+  become: true
+  fetch:
+    src: "/home/{{ default_ssh_user | default('testuser') }}/.ssh/id_rsa.pub"
+    dest: "buffer/{{ansible_hostname}}-id_rsa.pub"
+    flat: true
+
+- name: "Ensure SSH User | Set Up Authorized Keys for {{ default_ssh_user | default('testuser') }} and between servers"
   become: true
   authorized_key:
     user: '{{ default_ssh_user | default("testuser") }}'
-    key: '{{item}}'
+    key: '{{ item }}'
     state: present
   with_file:
     - "{{ default_ssh_user_keypath | default('files/test_rsa.pub') }}"
-    #TODO Modify and put test pub
+
+- name: "Ensure SSH User | Set Up Authorized Keys between servers as root"
+  become: true
+  authorized_key:
+    user: root
+    key: "{{ lookup('file','buffer/{{item}}-id_rsa.pub') }}"
+    state: present
+  with_items:
+    - '{{ groups[ "all" ] }}'
+  when: '{{ item != ansible_hostname }}'
+
+- name: "Ensure SSH User | SSHd Config update"
+  become: true
+  copy:
+    src: files/sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  changed_when: false
+  #TODO compare hashes when the file exists
+
+- name: "Ensure SSH User | Update SSH port in ssh config"
+  become: true
+  replace:
+    path: /etc/ssh/sshd_config
+    regexp: "<SSH_PORT_PLACEHOLDER>"
+    replace: "{{ ssh_port | default('22') }}"
+  changed_when: false

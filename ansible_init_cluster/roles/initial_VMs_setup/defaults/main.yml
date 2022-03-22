@@ -25,3 +25,4 @@ required_packages:
   - curl
   - wget
   - gpg-agent
+  - acl

@@ -1,8 +1,4 @@
 ---
-- name: debug
-  debug:
-    msg: "{{ hostvars['master1'].ansible_host }}"
-
 - name: Join Additional Nodes | Get Join Command
   become: true
   become_user: ettorefoti
@@ -11,25 +7,21 @@
   changed_when: false #TODO find if there is a better way to avoid it
   when: '"master1" in inventory_hostname'
 
-- name: debug
-  debug:
-    msg: "{{ hostvars['master1'].join_command_raw.stdout_lines }}"
-
 #- name: Join Additional Nodes | Set Join Command ansible_fact
 #  set_fact:
 #    join_command: "{{ join_command_raw.stdout_lines[0] }}"
 #  when: '"master1" in inventory_hostname'
 
-- name: Ensure PKI Path exists on additional controlplanes
+- name: Join Additional Nodes | Ensure PKI Path exists on additional controlplanes
   become: true
   file:
     path: /etc/kubernetes/pki/etcd
     state: directory
     mode: 0644
-    owner: ettorefoti
+    owner: root
   when: 'inventory_hostname in groups["hybrids"]' #TODO it should do additional masters
 
-- name: Test Synch
+- name: Join Additional Nodes | Copy Certificates to Additional Controlplanes
   become: true
   command: "rsync -avPh -e 'ssh -i /home/ettorefoti/.ssh/id_rsa -o StrictHostKeyChecking=no' /etc/kubernetes/pki/{{ item }} {{ hostvars[inventory_hostname].ansible_host }}:/etc/kubernetes/pki/{{ item }}"
   delegate_to: master1
@@ -67,4 +59,3 @@
     state: restarted
     daemon_reload: true
     name: kubelet
-  when: 'inventory_hostname in groups["hybrids"]'

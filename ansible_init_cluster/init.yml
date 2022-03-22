@@ -1,0 +1,12 @@
+---
+- name: Bootsrap Kubernetes Cluster
+  tasks:
+    - name: Ensure SSH User
+      import_role: ensure_ssh_user
+      tags: ensure_ssh_user
+    - name: Initial VMs Setup
+      import_role: initial_VMs_setup
+      tags: initial_VMS_setup
+    - name: Setup Cluster
+      import_role: setup_cluster
+      tags: setup_cluster
