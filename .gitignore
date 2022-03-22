@@ -1,1 +1,2 @@
-infrastructure_as_code/variables.tf
+infrastructure_as_code/terraform/variables.tf
+infrastructure_as_code/terraform/.*

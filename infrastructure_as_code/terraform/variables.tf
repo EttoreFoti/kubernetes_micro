@@ -1,12 +1,12 @@
 // Define your Hetzner Cloud Api Token
 variable "hcloud_token" {
     type = string
-    default = "6uoGm29RNjhFYRMCwsjVuihVhhZMyLMskXUgzW3rEC8nvHHy1YGVBcTJV32kVq1m"
+    default = "LK5TuDjeGLnusmGtimegw7AbQQ25ndl3xfAoUdWggNWz55YCrxTeYhcTFUShLdzc"
 }
 // Define your Hetzner SSH Key Name
 variable "ssh_key" {
     type = string
-    default = "my own"
+    default = "id_rsa_hertz"
 }
 // SSH root user key file path
 variable "hcloud_ssh_key_local_path" {
@@ -16,7 +16,7 @@ variable "hcloud_ssh_key_local_path" {
 // Number of nodes you want to provision
 variable "server_count" {
     type = string
-    default = "2"
+    default = "3"
 }
 // Host Name / Host Name Prefix
 variable "server_name" {
@@ -61,7 +61,7 @@ variable "server_type" {
 // VM Image
 variable "image" {
     type = string
-    default = "centos-7"
+    default = "ubuntu-20.04"
 }
 // Docker Version
 variable "docker_version" {
