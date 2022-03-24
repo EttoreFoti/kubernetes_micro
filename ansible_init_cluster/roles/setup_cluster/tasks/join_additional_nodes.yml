@@ -19,7 +19,7 @@
     state: directory
     mode: 0644
     owner: root
-  when: 'inventory_hostname in groups["hybrids"]' #TODO it should do additional masters
+  when: 'inventory_hostname in groups["hybrids"] or (inventory_hostname in groups["masters"] and inventory_hostname != "master1")'
 
 - name: Join Additional Nodes | Copy Certificates to Additional Controlplanes
   become: true
@@ -55,7 +55,7 @@
 
 - name: Join Additional Nodes | Restart Kubelets
   become: true
-  ansible.builtin.systemd:
+  systemd:
     state: restarted
     daemon_reload: true
     name: kubelet
