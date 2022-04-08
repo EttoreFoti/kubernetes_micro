@@ -17,7 +17,7 @@
   become: true
   copy:
     src: /etc/kubernetes/admin.conf
-    dest: /home/ettorefoti/.kube/config
+    dest: /home/ettorefoti/.kube/config #TODO add exchange for local pc kubeconfig exchange
     remote_src: true
     owner: ettorefoti
     mode: 0664

@@ -1,2 +1,4 @@
 infrastructure_as_code/terraform/variables.tf
 infrastructure_as_code/terraform/.*
+ansible_init_cluster/roles/harden_ubuntu2004_cis
+ansible_init_cluster/roles/deploy_tools_k8s

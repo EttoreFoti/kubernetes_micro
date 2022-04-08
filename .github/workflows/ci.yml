@@ -36,13 +36,19 @@ jobs:
 #          ./ansible_init_cluster/ci_tools/create_testbox.sh
 #        if: ${{ ! matrix.skip_vagrant }}
       - name: Run Molecule Test on ensure_ssh_user.
-        run: cd ansible_init_cluster/roles/ensure_ssh_user && molecule test && cd ../initial_VMs_setup && molecule test
+        run: cd ansible_init_cluster/roles/ensure_ssh_user && molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           TESTBOX: generic/ubuntu2004
       - name: Run Molecule Test on initial_VMs_setup.
-        run: cd ansible_init_cluster/roles/initial_VMs_setup
+        run: cd ansible_init_cluster/roles/initial_VMs_setup && molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          TESTBOX: generic/ubuntu2004
+      - name: Run Molecule Test on setup_cluster.
+        run: cd ansible_init_cluster/roles/setup_cluster && molecule test
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'

@@ -1,8 +1,23 @@
 ---
 # tasks file for setup_cluster
+- name: Setup Cluster | Check if Cluster ids already initialized (idempotence)
+  become: true
+  become_user: ettorefoti
+  command: "kubectl get nodes"
+  when: "'master1' in inventory_hostname"
+  register: kube_status
+  ignore_errors: true
+  changed_when: false
+
+- name: Debug
+  debug:
+    msg: "{{ hostvars['master1'].kube_status.stdout }}"
+
 - name: Setup Cluster | Init K8s Cluster on Master1
   import_tasks: kubeadmInitOnControlPlane.yml
-  when: "'master1' in inventory_hostname"
+  when: "inventory_hostname == 'master1' and 'master1' not in hostvars['master1'].kube_status.stdout"
+
 - name: Setup Cluster | Join Additional Nodes
   import_tasks: join_additional_nodes.yml
+  when: "inventory_hostname not in hostvars['master1'].kube_status.stdout"
 
