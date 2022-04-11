@@ -8,7 +8,7 @@
 
 - name: Init K8s Cluster on Master1 | create .kube directory
   become: true
-  become_user: ettorefoti
+  become_user: "{{ default_ssh_user | default('testuser') }}"
   file:
     path: $HOME/.kube
     state: directory
@@ -17,14 +17,14 @@
   become: true
   copy:
     src: /etc/kubernetes/admin.conf
-    dest: /home/ettorefoti/.kube/config #TODO add exchange for local pc kubeconfig exchange
+    dest: "/home/{{ default_ssh_user | default('testuser') }}/.kube/config" #TODO add exchange for local pc kubeconfig exchange
     remote_src: true
-    owner: ettorefoti
+    owner: "{{ default_ssh_user | default('testuser') }}"
     mode: 0664
 
 - name: Init K8s Cluster on Master1 | install Pod network
   become: true
-  become_user: ettorefoti
+  become_user: "{{ default_ssh_user | default('testuser') }}"
   shell: "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml >> pod_network_setup.txt"
   args:
     chdir: $HOME

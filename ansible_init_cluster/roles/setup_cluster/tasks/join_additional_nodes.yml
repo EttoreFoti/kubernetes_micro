@@ -1,8 +1,8 @@
 ---
 - name: Join Additional Nodes | Get Join Command
   become: true
-  become_user: ettorefoti
-  shell: 'kubeadm token create --print-join-command' #just for knowledge, this is not correct, this should point to the LB address
+  become_user: "{{ default_ssh_user | default('testuser') }}"
+  shell: 'kubeadm token create --print-join-command' #just for knowledge, this is not correct, this should point to the LB address when present
   register: join_command_raw
   changed_when: false #TODO find if there is a better way to avoid it
   when: '"master1" in inventory_hostname'
@@ -23,7 +23,7 @@
 
 - name: Join Additional Nodes | Copy Certificates to Additional Controlplanes
   become: true
-  command: "rsync -avPh -e 'ssh -i /home/ettorefoti/.ssh/id_rsa -o StrictHostKeyChecking=no' /etc/kubernetes/pki/{{ item }} {{ hostvars[inventory_hostname].ansible_host }}:/etc/kubernetes/pki/{{ item }}"
+  command: "rsync -avPh -e 'ssh -i /home/{{ default_ssh_user | default('testuser') }}/.ssh/id_rsa -o StrictHostKeyChecking=no' /etc/kubernetes/pki/{{ item }} {{ hostvars[inventory_hostname].ansible_host }}:/etc/kubernetes/pki/{{ item }}"
   delegate_to: master1
   when: 'inventory_hostname in groups["hybrids"]'
   with_items:

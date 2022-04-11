@@ -2,7 +2,7 @@
 # tasks file for setup_cluster
 - name: Setup Cluster | Check if Cluster ids already initialized (idempotence)
   become: true
-  become_user: ettorefoti
+  become_user: "{{ default_ssh_user | default('testuser') }}"
   command: "kubectl get nodes"
   when: "'master1' in inventory_hostname"
   register: kube_status

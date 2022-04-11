@@ -1,0 +1,29 @@
+docker:
+  config_path: '/etc/docker'
+  repo_url: 'deb https://download.docker.com/linux/ubuntu xenial stable'
+  required_packages:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+
+gpg_keys:
+  - 'https://packages.cloud.google.com/apt/doc/apt-key.gpg' # Google/K8s
+  - 'https://download.docker.com/linux/ubuntu/gpg' # Docker
+
+kubernetes:
+  repo_url: 'deb https://apt.kubernetes.io/ kubernetes-xenial main'
+  required_packages:
+    - kubeadm
+    - kubectl
+    - kubelet
+
+required_packages:
+  - ca-certificates
+  - apt-transport-https
+  - curl
+  - wget
+  - gpg-agent
+  - acl
+
+default_ssh_user: ettorefoti
+#default_ssh_user_keypath: ~/.ssh/id_rsa.pub
